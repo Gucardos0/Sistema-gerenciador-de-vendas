@@ -65,6 +65,7 @@ def cadastrarCliente(nome, email, telefone):
 
 
 def registrarVenda(id_cliente, id_produto, quantidade):
+
     conexao =sqlite3.connect("sgv (2).db")
     cursor = conexao.cursor()
 
@@ -72,26 +73,55 @@ def registrarVenda(id_cliente, id_produto, quantidade):
     estoque = cursor.fetchone() #pega a linha do que foi solicitado acima
 
     if estoque is None:
-         print(" Produto não encontrado.")
+         print(" Produto não encontrado.") 
+         
     elif estoque[0] < quantidade: # posição 0 para buscar o primiro item do "cursor.fetchone()"
         print("Estoque insuficiente")
 
     else:
         cursor.execute(
             " INSERT INTO venda (id_cliente, id_produto, quantidade) VALUES (?, ?, ?)",
-                        (id_cliente, id_produto, quantidade)
-    )
-    cursor.execute("""
+                        (id_cliente, id_produto, quantidade))
+        cursor.execute("""
             UPDATE produto SET estoque = estoque - ?
             WHERE id = ?
         """, (quantidade, id_produto))
 
-    conexao.commit()
-    print(" Venda registrada com sucesso!")
+        conexao.commit()
+        print(" Venda registrada com sucesso!")
+       
+    
 
     conexao.close()
         
-        
+
+def atualizarEstoque(id_produto, estoque ):
+    conexao =sqlite3.connect("sgv (2).db")
+    cursor = conexao.cursor()
+    cursor.execute(""" UPDATE produto SET estoque = ? 
+                    WHERE id = ?
+    
+     """, (estoque,  id_produto))
+    print("Produto atualizado")
+
+
+    conexao.commit()
+    conexao.close()
+
+
+def autualizarPreco(id_produto, preco ):
+    conexao =sqlite3.connect("sgv (2).db")
+    cursor = conexao.cursor()
+    cursor.execute(""" UPDATE produto SET preco = ? 
+                    WHERE id = ?
+    
+     """, (preco,  id_produto))
+    print("Produto atualizado")
+
+
+    conexao.commit()
+    conexao.close()
+
 def listarProdutos():
     conexao =sqlite3.connect("sgv (2).db")
     cursor = conexao.cursor()
@@ -112,7 +142,9 @@ def menuPrincipal():
         print("1 - Cadastrar produto")
         print("2 - Cadastrar cliente")
         print("3 - Registrar venda")
-        print("4 - Listar produtos")
+        print("4 - Lista de produtos")
+        print("5 - Atualizar estoque")
+        print("6 - Atualizar preço")
         print("0 - Sair")
 
         opcao = input("Escolha uma opção: ")
@@ -137,6 +169,19 @@ def menuPrincipal():
 
         elif opcao == "4":
             listarProdutos()
+        
+        elif opcao == "5":
+            id_produto = input("ID do produto: ")
+            estoque = int(input("Estoque: "))
+            atualizarEstoque(id_produto, estoque)
+
+        elif opcao == "6":
+            id_produto = input("ID do produto: ")
+            preco = int(input("Preço: "))
+            autualizarPreco(id_produto, preco)
+
+
+
 
         elif opcao == "0":
            break
